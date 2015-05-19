@@ -1,0 +1,37 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="edu.noctrl.ydeleon.project2.PMForecast"
+    android:background="@color/blue">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@color/white"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/pm_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/placeholder"/>
+        <TextView
+            android:layout_below="@id/pm_desc"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/textViewPM"
+            android:text="PM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_below="@id/textViewPM"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/pm_details"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/placeholder" />
+    </RelativeLayout>
+
+</FrameLayout>
