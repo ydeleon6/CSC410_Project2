@@ -184,14 +184,26 @@ public class MainActivity extends ActionBarActivity {
     public void getJSONZips(String query) throws JSONException {
         JSONArray zipCodes;
         int oldest;
+        List<String> zipList = getZipList();
 
         zipCodes = new JSONArray(sharedPref.getString("JSON", "[]"));
-        oldest = sharedPref.getInt("oldest", 0);
+        //oldest = sharedPref.getInt("oldest", 0);
 
-        zipCodes.put(oldest, query);
+        if(!zipList.contains(query)){
+            for(int i = zipCodes.length() - 1; i > 0; i--){
+                zipCodes.put(i, zipCodes.get(i-1));
+            }
 
+            zipCodes.put(0, query);
+
+        }
+        else if (zipList.contains(query)){
+            for(int i = zipList.indexOf(query); i > 0; i--){
+                zipCodes.put(i, zipCodes.get(i-1));
+            }
+            zipCodes.put(0, query);
+        }
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt("oldest", (oldest + 1) % 5);
         editor.putString("JSON", zipCodes.toString());
         editor.commit();
     }
