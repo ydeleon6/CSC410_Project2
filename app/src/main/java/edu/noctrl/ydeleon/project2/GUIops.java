@@ -61,6 +61,7 @@ public class GUIops {
         metricRadio = (RadioButton)activity.findViewById(R.id.metric);
         imperialRadio = (RadioButton)activity.findViewById(R.id.imperial);
         Log.i("GUIops","creating the cache");
+        //http://developer.android.com/reference/android/util/LruCache.html got info from here
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         // Use 1/8th of the available memory for this memory cache.
         final int cacheSize = maxMemory / 8;
@@ -204,29 +205,39 @@ public class GUIops {
         }
         makeHazardAlerts();
         //set fields
-        temperature.setText(current.temperature+" F");
-        dew.setText(current.dewPoint+" F");
-        humidity.setText(current.humidity + " F");
-        displayConditions.setText(current.summary);
-        pressure.setText(current.pressure+" in");
-        visibility.setText(current.visibility+" F");
-        windspeed.setText(current.windSpeed+" F");
-        gust.setText(current.gusts+" mph");
-        currTime.setText(current.timestamp);
-
-        //get unit
-        /*String system = "Imperial";
+        String system = "imp";
         if(sp.contains("system")){
-            system = sp.getString("system","Imperial"); //if nothing is there, use default;
+            system = sp.getString("system", "imp");
         }
-        if(system.equals("Imperial")){
-            imperialRadio.toggle();
-            toImp();
+        if(system.equals("imp")) {
+            temperature.setText(current.temperature + " F");
+            dew.setText(current.dewPoint + " F");
+            humidity.setText(current.humidity + " F");
+            displayConditions.setText(current.summary);
+            pressure.setText(current.pressure + " in");
+            visibility.setText(current.visibility + " F");
+            windspeed.setText(current.windSpeed + " F");
+            gust.setText(current.gusts + " mph");
+            currTime.setText(current.timestamp);
         }
-        else if(system.equals("Metric")){
+        else{
             metricRadio.toggle();
-            toMetric();
-        }*/
+            DecimalFormat df = new DecimalFormat("###0.0");
+            temperature.setText(df.format(((current.temperature-32)*5)/9) + " C");
+            dew.setText(df.format(((current.dewPoint-32)*5)/9) + " C");
+            humidity.setText(current.humidity + " %");
+            displayConditions.setText(current.summary);
+            pressure.setText(df.format((current.pressure*10)*2.54) + " mb");
+            visibility.setText(df.format((current.visibility*1.60934)) + " km");
+            windspeed.setText(df.format((current.windSpeed*1.60934)) + " km/h");
+            if(current.gusts == Double.NaN){
+                gust.setText("NaN km/h");
+            }else{
+                gust.setText(df.format((current.gusts*1.60934)) + " km/h");
+            }
+
+            currTime.setText(current.timestamp);
+        }
 
     }
     public static void updateCurrentImage(Bitmap image){

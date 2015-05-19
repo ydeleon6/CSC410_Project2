@@ -32,6 +32,7 @@ import edu.noctrl.ydeleon.WeatherXmlParser.WeatherInfoIO;
 
 
 public class MainActivity extends ActionBarActivity {
+
     public static Activity mainActivity;
     public static Context mainContext;
     SharedPreferences sharedPref;
@@ -51,6 +52,59 @@ public class MainActivity extends ActionBarActivity {
         Log.i("DEBUG", "initialized variables");
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        try{
+            List<String> zips = getZipList();
+            //get size
+            int size = zips.size();
+            //add that many to the menu
+            for(int i=0; i < size; i++){
+                menu.add(0,i,i,zips.get(i)); //add to menu
+            }
+        }
+        catch(JSONException e){
+            //eat exception
+        }
+    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        Log.i("DEBUG","ID was "+item.getItemId());
+        List<String> zips;
+        try {
+            zips = getZipList();
+        }
+        catch(JSONException e){
+            Log.e("ERROR", e.getMessage());
+            zips = null;
+        }
+        if(zips == null){return false;}
+        int id = item.getItemId();
+        switch(id){
+            case 0:
+                search(zips.get(0));
+                break;
+            case 1:
+                search(zips.get(1));
+                break;
+            case 2:
+                search(zips.get(2));
+                break;
+            case 3:
+                search(zips.get(3));
+                break;
+            case 4:
+                search(zips.get(4));
+                break;
+        }
+        return true;
+    }
+    public void search(String zip){
+        String url = "http://craiginsdev.com/zipcodes/findzip.php?zip=" + zip;
+        WeatherInfoIO.WeatherListener listener = new WeatherInfoIO.WeatherListener();
+        WeatherInfoIO.loadFromUrl(url, listener);
+    }
     public void onRadioButtonClicked(View view) {
         GUIops.onRadioButtonClicked(view);
     }
@@ -66,32 +120,16 @@ public class MainActivity extends ActionBarActivity {
         // Get the SearchView and set the searchable configuration
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.search_zip).getActionView();
+        registerForContextMenu(searchView);
         // Assumes current activity is the searchable activity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
         if (searchView != null) {
             final Menu menu_block = menu;
-            searchView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
-                @Override
-                public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-
-                }
-            });
-            /*searchView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    //call dialog stuff
-                    makeZipDialog();
-                    return true;
-                }
-            });*/
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // collapse the view ?
-                JSONArray zipCodes;
-
                 if(isNetworkConnected()) {
                     boolean hasNonAlpha = false;
                     try {
@@ -110,11 +148,8 @@ public class MainActivity extends ActionBarActivity {
                             e.printStackTrace();
                         }
 
-                        MessageMaker.toastMaker(savedZips.toString());
-
-                        String url = "http://craiginsdev.com/zipcodes/findzip.php?zip=" + query;
-                        WeatherInfoIO.WeatherListener listener = new WeatherInfoIO.WeatherListener();
-                        WeatherInfoIO.loadFromUrl(url, listener);
+                        //MessageMaker.toastMaker(savedZips.toString());
+                        search(query);
                         menu_block.findItem(R.id.search_zip).collapseActionView();
                     } else {
                         //toast saying no luck.
@@ -197,8 +232,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public List<String> getZipList() throws JSONException {
-        List<String> savedZips = new ArrayList<String>();
-        String zip = "";
+        List<String> savedZips = new ArrayList<>();
         JSONArray zips = null;
         sharedPref = mainActivity.getPreferences(Context.MODE_PRIVATE);
 
